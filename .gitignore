@@ -1,18 +1,153 @@
-# Build and Release Folders
-bin-debug/
-bin-release/
-[Oo]bj/
-[Bb]in/
+#include <Wire.h> 
+#include <LiquidCrystal_I2C.h>
+#include <SD.h>                      // need to include the SD library
+//#define SD_ChipSelectPin 53  //example uses hardware SS pin 53 on Mega2560
+#define SD_ChipSelectPin 4  //using digital pin 4 on arduino nano 328, can use other pins
+#include <TMRpcm.h>           //  also need to include this library...
+#include <SPI.h>
+#include <SoftwareSerial.h>
 
-# Other files and folders
-.settings/
 
-# Executables
-*.swf
-*.air
-*.ipa
-*.apk
+String value1;
+int TxD=3, RxD=5;
 
-# Project files, i.e. `.project`, `.actionScriptProperties` and `.flexProperties`
-# should NOT be excluded as they contain compiler settings and other important
-# information for Eclipse / Flash Builder.
+SoftwareSerial bluetooth(RxD,TxD);
+
+TMRpcm tmrpcm;
+unsigned long time = 0;
+LiquidCrystal_I2C lcd(0x27,20,4);
+void setup()
+{
+   
+   Serial.begin(9600);
+  delay(2000);
+  bluetooth.begin(9600);
+   lcd.init();                      // initialize the lcd 
+  lcd.init();
+  // Print a message to the LCD.
+  lcd.backlight();
+ 
+  
+}
+
+void loop()
+{
+  int a,b,c;
+  delay(3000);
+  if(bluetooth.available())
+  {
+    value1=bluetooth.readString();
+    value1.toLowerCase();
+    Serial.println(value1);
+   String s2="fever";
+   String s3="diabetes";
+   String s4="thyroid";
+   a=findtext(value1,s2);
+   b=findtext(value1,s3);
+   c=findtext(value1,s4); 
+      
+   
+   if(a>0)
+   {
+    Serial.print("Medicine:");
+    Serial.print("Crocine Advance");
+   
+   lcd.setCursor(0,0);
+   lcd.print("Needed Medicine");
+   lcd.setCursor(0,1);
+   
+   
+   lcd.print("Crocin advance");
+   delay(3000);
+   lcd.clear();
+   lcd.setCursor(0,0);
+   lcd.print("Child Dose:500mg ");
+   lcd.setCursor(0,1);
+   lcd.print("Adult Dose:650mg");
+   
+   delay(3000);
+   lcd.clear();
+      
+      delay(2000);
+   }
+  else if(b>0)
+   { Serial.print("Needed Medicine");
+       Serial.print(" Gluconorm PG");
+
+     lcd.setCursor(0,0);
+   lcd.print("Needed Medicine");
+   
+     lcd.setCursor(0,1);
+     
+      lcd.print("Gluconorm Pg");
+   delay(3000);
+   lcd.clear();
+      lcd.setCursor(0,0);
+   lcd.print("Child Dose:250mg ");
+   lcd.setCursor(0,1);
+   lcd.print("Adult Dose:400mg");
+   
+   delay(3000);
+   lcd.clear();
+   
+  
+      
+      delay(2000);
+   
+   
+   }
+  else if(c>0)
+   {
+   Serial.print("Medicine:");
+   
+      Serial.print("Thyrox 25");
+     
+      
+      lcd.setCursor(0,0);
+   lcd.print("Needed Medicine");
+   
+      lcd.setCursor(0,1);
+       lcd.print("Thyrox 25");
+   delay(3000);
+   lcd.clear();
+   lcd.setCursor(0,0);
+   lcd.print("Child Dose:550mg ");
+   lcd.setCursor(0,1);
+   lcd.print("Adult Dose:650mg");
+   
+   delay(3000);
+   lcd.clear();
+   
+  
+      delay(2000);
+   
+   
+   }
+   else
+   {
+   Serial.print("invalid input");
+   
+   lcd.setCursor(0,0);
+    lcd.print("invalid output");
+   delay(4000);
+   lcd.clear();
+  
+   }
+}
+
+}
+
+int findtext(String value,String s1)
+{
+  
+  int foundpos = -1;
+  if (s1.length() <= value.length())
+  {
+    for (int i = 0; i <= value.length() - s1.length(); i++)
+    {
+      if (value.substring(i,s1.length()+i) == s1)
+        foundpos = i;
+    }
+  }
+  return foundpos;
+}
